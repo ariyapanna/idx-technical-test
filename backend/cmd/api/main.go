@@ -19,11 +19,17 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
+	// Category
 	categoryRepo := repository.NewCategoryRepository(db)
 	categoryUsecase := usecase.NewCategoryUsecase(categoryRepo)
 	categoryHandler := handler.NewCategoryHandler(categoryUsecase)
 
-	r := router.NewRouter(categoryHandler)
+	// Todo
+	todoRepo := repository.NewTodoRepository(db)
+	todoUsecase := usecase.NewTodoUsecase(todoRepo)
+	todoHandler := handler.NewTodoHandler(todoUsecase)
+
+	r := router.NewRouter(categoryHandler, todoHandler)
 
 	log.Printf("Server running on :%s", cfg.Server.Port)
 	if err := r.Run(":" + cfg.Server.Port); err != nil {

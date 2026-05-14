@@ -3,11 +3,13 @@ package router
 import (
 	"todolist-backend/internal/delivery/http/handler"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(categoryHandler *handler.CategoryHandler) *gin.Engine {
+func NewRouter(categoryHandler *handler.CategoryHandler, todoHandler *handler.TodoHandler) *gin.Engine {
 	r := gin.Default()
+	r.Use(cors.Default())
 
 	v1 := r.Group("/api/v1")
 	{
@@ -18,6 +20,16 @@ func NewRouter(categoryHandler *handler.CategoryHandler) *gin.Engine {
 			categories.GET("/:id", categoryHandler.GetByID)
 			categories.PUT("/:id", categoryHandler.Update)
 			categories.DELETE("/:id", categoryHandler.Delete)
+		}
+
+		todos := v1.Group("/todos")
+		{
+			todos.POST("", todoHandler.Create)
+			todos.GET("", todoHandler.List)
+			todos.GET("/:id", todoHandler.GetByID)
+			todos.PUT("/:id", todoHandler.Update)
+			todos.DELETE("/:id", todoHandler.Delete)
+			todos.PATCH("/:id/complete", todoHandler.Complete)
 		}
 	}
 
