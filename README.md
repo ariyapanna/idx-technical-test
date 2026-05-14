@@ -1,0 +1,1 @@
+# industrix-fullstack-engineer-intern-technical-test
