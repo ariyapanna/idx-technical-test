@@ -25,6 +25,10 @@ func (c *Category) ValidateName() error {
 		return apperror.NewValidationError("name must be at least 3 characters")
 	}
 
+	if len(trimmedName) > 255 {
+		return apperror.NewValidationError("name cannot exceed 255 characters")
+	}
+
 	return nil
 }
 
