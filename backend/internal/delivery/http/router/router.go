@@ -27,6 +27,7 @@ func NewRouter(categoryHandler *handler.CategoryHandler, todoHandler *handler.To
 			todos.GET("/:id", todoHandler.GetByID)
 			todos.PUT("/:id", todoHandler.Update)
 			todos.DELETE("/:id", todoHandler.Delete)
+			todos.PATCH("/:id/complete", todoHandler.Complete)
 		}
 	}
 

@@ -6,9 +6,4 @@ type TodoFilter struct {
 	Search     string
 	SortBy     string
 	SortOrder  string
-
-	Completed  *bool
-	CategoryID *int
-
-	Priority   string
 }

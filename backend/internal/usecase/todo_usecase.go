@@ -176,6 +176,27 @@ func (u *TodoUsecase) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 
+func (u *TodoUsecase) MarkAsCompleted(ctx context.Context, id uint) (*TodoResponse, error) {
+	todo, err := u.repo.GetByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperror.NewNotFoundError("todo not found")
+		}
+		return nil, apperror.NewInternalError(err)
+	}
+
+	if err := u.repo.MarkAsCompleted(ctx, todo.ID); err != nil {
+		return nil, apperror.NewInternalError(err)
+	}
+
+	fullTodo, err := u.repo.GetByID(ctx, todo.ID)
+	if err != nil {
+		return nil, apperror.NewInternalError(err)
+	}
+
+	return u.mapToResponse(fullTodo), nil
+}
+
 func (u *TodoUsecase) mapToResponse(todo *entity.Todo) *TodoResponse {
 	var dueDateStr *string
 	if todo.DueDate != nil {

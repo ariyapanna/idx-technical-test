@@ -27,15 +27,6 @@ func (r *todoRepository) List(ctx context.Context, f filter.TodoFilter) ([]entit
 
 	db := r.db.WithContext(ctx).Model(&model.Todo{})
 
-	if f.CategoryID != nil {
-		db = db.Where("category_id = ?", *f.CategoryID)
-	}
-	if f.Completed != nil {
-		db = db.Where("completed = ?", *f.Completed)
-	}
-	if f.Priority != "" {
-		db = db.Where("priority = ?", f.Priority)
-	}
 	if f.Search != "" {
 		db = db.Where("title ILIKE ?", "%"+f.Search+"%")
 	}
@@ -111,7 +102,7 @@ func (r *todoRepository) Update(ctx context.Context, todo *entity.Todo) error {
 	if err != nil {
 		return err
 	}
-	
+
 	var updated model.Todo
 	if err := r.db.WithContext(ctx).Select("updated_at").First(&updated, todo.ID).Error; err == nil {
 		todo.UpdatedAt = updated.UpdatedAt
@@ -122,6 +113,13 @@ func (r *todoRepository) Update(ctx context.Context, todo *entity.Todo) error {
 
 func (r *todoRepository) Delete(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&model.Todo{}, id).Error
+}
+
+func (r *todoRepository) MarkAsCompleted(ctx context.Context, id uint) error {
+	return r.db.WithContext(ctx).
+		Model(&model.Todo{}).
+		Where("id = ?", id).
+		Update("completed", gorm.Expr("NOT completed")).Error
 }
 
 func (r *todoRepository) toEntity(m *model.Todo) *entity.Todo {

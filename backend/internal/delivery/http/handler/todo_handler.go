@@ -45,21 +45,6 @@ func (h *TodoHandler) List(c *gin.Context) {
 	search := c.Query("search")
 	sortBy := c.Query("sort_by")
 	sortOrder := c.Query("sort_order")
-	priority := c.Query("priority")
-
-	var categoryID *int
-	if catIDStr := c.Query("category_id"); catIDStr != "" {
-		if id, err := strconv.Atoi(catIDStr); err == nil {
-			categoryID = &id
-		}
-	}
-
-	var completed *bool
-	if compStr := c.Query("completed"); compStr != "" {
-		if comp, err := strconv.ParseBool(compStr); err == nil {
-			completed = &comp
-		}
-	}
 
 	f := filter.TodoFilter{
 		Page:       page,
@@ -67,9 +52,6 @@ func (h *TodoHandler) List(c *gin.Context) {
 		Search:     search,
 		SortBy:     sortBy,
 		SortOrder:  sortOrder,
-		CategoryID: categoryID,
-		Completed:  completed,
-		Priority:   priority,
 	}
 
 	result, err := h.usecase.List(c.Request.Context(), f)
@@ -151,4 +133,21 @@ func (h *TodoHandler) Delete(c *gin.Context) {
 	}
 
 	http_helper.SuccessResponse(c, http.StatusOK, "Todo deleted successfully", nil)
+}
+
+func (h *TodoHandler) Complete(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		http_helper.ErrorResponse(c, http.StatusBadRequest, "Invalid todo ID", err)
+		return
+	}
+
+	response, err := h.usecase.MarkAsCompleted(c.Request.Context(), uint(id))
+	if err != nil {
+		http_helper.ErrorResponse(c, http.StatusInternalServerError, "Failed to complete todo", err)
+		return
+	}
+
+	http_helper.SuccessResponse(c, http.StatusOK, "Todo status updated successfully", dto.NewTodoResponse(response))
 }
