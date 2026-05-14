@@ -8,5 +8,5 @@ type Category struct {
 	Color     string	`gorm:"not null"`
 	CreatedAt time.Time
 
-	Todos []Todo `gorm:"foreignKey:CategoryID"`
+	// Todos []Todo `gorm:"foreignKey:CategoryID"`
 }
