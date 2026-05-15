@@ -126,18 +126,24 @@ go test ./internal/usecase/...
    - **Custom Hooks**: Business logic is decoupled into hooks like `useTodoManagement.ts`, making the components clean and testable.
    - **State Management**: Used React `useState` and `useCallback` for local state. Fetching is triggered via `useEffect` and manually upon actions (like opening a modal).
 
-3. **What backend architecture did you choose?**
-   - **Clean Architecture & Layered Architecture**: Organized into:
-     - `domain`: Core entities and repository interfaces.
-     - `usecase`: Business logic layer.
-     - `delivery/http`: HTTP handlers and routing.
-     - `infrastructure`: Database & external services implementation (GORM).
-   - **Error Handling**: Implemented a custom `apperror` package to standardize HTTP error responses (404 for not found, 400 for validation).
+3. **What backend architecture did you choose and why?**
+   - **Clean Architecture & Layered Architecture**: I chose this because it decouples business logic from external dependencies (like the database or web framework), making the code easier to maintain, test, and scale.
+   - **API Route Organization**: Routes are organized under the `/api/v1` prefix to support future versioning. I followed **RESTful API standards**, using plural resource naming (e.g., `/todos`, `/categories`) and appropriate HTTP verbs (GET, POST, PUT, DELETE, PATCH).
+   - **Code Structure**:
+     - `delivery/http`: Handlers that manage HTTP requests and responses.
+     - `usecase`: The "interactor" layer that contains the core business logic.
+     - `repository`: The data access layer (Infrastructure) implemented using GORM.
+     - `domain`: Contains entities and interfaces that define the system's core.
+   - **Error Handling**: Implemented a custom `apperror` package to standardize HTTP error responses (e.g., 404 for not found, 400 for validation errors, 500 for internal issues).
 
 4. **How did you handle data validation?**
-   - **Both sides**: 
-     - **Frontend**: Used Ant Design Form validation for immediate feedback.
-     - **Backend**: Implemented validation in the `entity` layer to ensure business rules are strictly enforced (e.g., title cannot be empty).
+   - **Where**: Validation is implemented on **both the frontend and backend**.
+   - **Validation Rules**:
+     - **Todos**: Required `title`, valid `priority` (high, medium, low), and proper date format (`YYYY-MM-DD`) for `due_date`.
+     - **Categories**: Required `name` (unique) and `color`.
+   - **Why this approach?**:
+     - **Frontend**: Provides immediate feedback to the user, improving the **User Experience (UX)** by preventing invalid requests before they reach the server.
+     - **Backend**: Acts as the **Single Source of Truth**. It ensures data integrity and security, protecting the database from invalid or malicious data that might bypass the frontend.
 
 ### Testing & Quality
 1. **What did you choose to unit test and why?**
@@ -150,7 +156,7 @@ go test ./internal/usecase/...
    - **Table-Driven Tests**: Used Go's idiomatic table-driven test pattern to handle multiple test scenarios (success/failure) in a single test function, making the test suite clean and easily extendable.
 
 3. **Future Improvements**
-   - **Technical Debt**: Replace the custom SQL runner with an industry-standard migration tool like `golang-migrate` for better version tracking.
+   - **Technical Debt**: Integrate the `golang-migrate` library into the Go application to replace the custom SQL runner, allowing for better version tracking via the `schema_migrations` table.
    - **Refactoring**: Implement **caching using Redis** for frequently accessed todo lists to optimize performance and reduce database load during high traffic.
    - **Features**: Implement User Authentication (JWT) and a more advanced tagging system.
 
