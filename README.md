@@ -88,6 +88,8 @@ go test ./internal/usecase/...
 
 ## 📖 API Documentation
 
+You can find a complete **Postman Collection** in `docs/todo_app_postman_collection.json`. Import this file into Postman to test all endpoints.
+
 ### Categories
 - `GET /api/v1/categories` - List all categories.
 - `POST /api/v1/categories` - Create a new category.
