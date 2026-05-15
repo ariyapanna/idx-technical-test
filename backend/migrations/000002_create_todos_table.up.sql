@@ -1,8 +1,10 @@
-CREATE TYPE todo_priority AS ENUM (
-    'high',
-    'medium',
-    'low'
-);
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'todo_priority') THEN
+        CREATE TYPE todo_priority AS ENUM ('high', 'medium', 'low');
+    END IF;
+END $$;
+
 
 CREATE TABLE IF NOT EXISTS todos (
     id BIGSERIAL PRIMARY KEY,
